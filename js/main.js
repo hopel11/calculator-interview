@@ -2207,3 +2207,34 @@ PERMUTATION_KEYS.forEach(([label, op, hint]) => {
   button.addEventListener('click', () => inputOperator(op));
   keyboard.insertBefore(button, keyboard.lastElementChild);
 });
+
+/** MS：用当前数值覆盖内存，保留正在输入的算式。 */
+function inputMemoryStore() {
+  if (isError()) {
+    return;
+  }
+  const value = Number(text);
+  if (!Number.isFinite(value)) {
+    return;
+  }
+  memory = value;
+  waiting = true;
+  updateMemoryIndicator();
+}
+
+const memoryStoreButton = document.createElement('button');
+memoryStoreButton.type = 'button';
+memoryStoreButton.className = 'key key--mem';
+memoryStoreButton.textContent = 'MS';
+memoryStoreButton.title = '内存存储：用当前数值覆盖内存';
+memoryStoreButton.addEventListener('click', inputMemoryStore);
+
+// 五个内存键共用一行，保留数字键盘的原有行列位置。
+const memoryButtons = Array.from(keyboard.querySelectorAll('.key--mem'));
+const memoryRow = document.createElement('div');
+memoryRow.className = 'keyboard__memory';
+memoryRow.setAttribute('role', 'group');
+memoryRow.setAttribute('aria-label', '内存键');
+keyboard.insertBefore(memoryRow, memoryButtons[0]);
+memoryButtons.forEach((button) => memoryRow.appendChild(button));
+memoryRow.insertBefore(memoryStoreButton, memoryButtons[1]);
